@@ -23,8 +23,14 @@ export const PREDICTIONS = [
 
 export const FORTUNE_COOKIE_ABI = [
   {
-    "inputs": [],
-    "name": "claimFortune",
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_prediction",
+        "type": "string"
+      }
+    ],
+    "name": "crackCookie",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -33,11 +39,46 @@ export const FORTUNE_COOKIE_ABI = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "user",
+        "name": "_user",
         "type": "address"
       }
     ],
-    "name": "getClaimsToday",
+    "name": "getUserCookies",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "prediction",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct FortuneCookie.Cookie[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalCookies",
     "outputs": [
       {
         "internalType": "uint256",
@@ -50,5 +91,4 @@ export const FORTUNE_COOKIE_ABI = [
   }
 ] as const;
 
-// Placeholder contract address - user should replace this after deployment
-export const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const CONTRACT_ADDRESS = "0xb159fD5c272a3019444ADC0dC21Ed07aDa640FDb";
