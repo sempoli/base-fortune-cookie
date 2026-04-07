@@ -28,31 +28,34 @@ function FortuneApp() {
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   // Read claims from contract
-  const { data: contractClaims, refetch: refetchClaims } = useReadContract({
+  const { data: userCookies, refetch: refetchCookies } = useReadContract({
     address: CONTRACT_ADDRESS as `0x${string}`,
     abi: FORTUNE_COOKIE_ABI,
-    functionName: 'getClaimsToday',
+    functionName: 'getUserCookies',
     args: [address as `0x${string}`],
     query: {
-      enabled: isConnected && CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000",
+      enabled: isConnected && (CONTRACT_ADDRESS as string) !== "0x0000000000000000000000000000000000000000",
     }
   });
 
   useEffect(() => {
-    if (contractClaims !== undefined) {
-      setClaimsToday(Number(contractClaims));
+    if (userCookies !== undefined) {
+      // Count cookies from the last 24 hours
+      const now = Math.floor(Date.now() / 1000);
+      const dayInSeconds = 24 * 60 * 60;
+      const recentCookies = (userCookies as any[]).filter(c => Number(c.timestamp) > now - dayInSeconds);
+      setClaimsToday(recentCookies.length);
     }
-  }, [contractClaims]);
+  }, [userCookies]);
 
   useEffect(() => {
     if (isConfirmed) {
-      const randomFortune = PREDICTIONS[Math.floor(Math.random() * PREDICTIONS.length)];
-      setFortune(randomFortune);
+      // The prediction was already set when calling writeContract
       setIsBroken(true);
       setIsBreaking(false);
-      refetchClaims();
+      refetchCookies();
     }
-  }, [isConfirmed, refetchClaims]);
+  }, [isConfirmed, refetchCookies]);
 
   const handleBreak = async () => {
     if (claimsToday >= 5) {
@@ -60,10 +63,11 @@ function FortuneApp() {
       return;
     }
 
-    if (CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+    const randomFortune = PREDICTIONS[Math.floor(Math.random() * PREDICTIONS.length)];
+
+    if ((CONTRACT_ADDRESS as string) === "0x0000000000000000000000000000000000000000") {
       setIsBreaking(true);
       setTimeout(() => {
-        const randomFortune = PREDICTIONS[Math.floor(Math.random() * PREDICTIONS.length)];
         setFortune(randomFortune);
         setIsBroken(true);
         setIsBreaking(false);
@@ -73,10 +77,12 @@ function FortuneApp() {
     }
 
     try {
+      setFortune(randomFortune); // Set it early so it's ready when confirmed
       writeContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
         abi: FORTUNE_COOKIE_ABI,
-        functionName: 'claimFortune',
+        functionName: 'crackCookie',
+        args: [randomFortune],
       } as any);
       setIsBreaking(true);
     } catch (e) {
