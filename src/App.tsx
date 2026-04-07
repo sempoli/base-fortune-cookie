@@ -7,10 +7,11 @@ import { useState, useEffect } from 'react';
 import { WagmiProvider, useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
+import { Identity, Name } from '@coinbase/onchainkit/identity';
 import { config } from './lib/web3';
 import { Cookie } from './components/Cookie';
 import { FortuneDisplay } from './components/FortuneDisplay';
-import { PREDICTIONS, FORTUNE_COOKIE_ABI, CONTRACT_ADDRESS } from './constants';
+import { PREDICTIONS, FORTUNE_COOKIE_ABI, CONTRACT_ADDRESS, DEVELOPER_ADDRESS } from './constants';
 import { Sparkles, Wallet, AlertCircle, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { base } from 'wagmi/chains';
@@ -266,8 +267,14 @@ function FortuneApp() {
         )}
       </main>
 
-      <footer className="relative z-10 p-6 text-center">
-        <p className="text-gray-600 text-[10px] uppercase tracking-[0.2em] font-medium">
+      <footer className="relative z-10 p-8 text-center flex flex-col items-center gap-4">
+        <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+          <span>Created by</span>
+          <Identity address={DEVELOPER_ADDRESS as `0x${string}`} className="bg-transparent p-0">
+            <Name address={DEVELOPER_ADDRESS as `0x${string}`} className="text-amber-500 hover:text-amber-400 transition-colors" />
+          </Identity>
+        </div>
+        <p className="text-gray-700 text-[8px] uppercase tracking-[0.3em] font-medium">
           Powered by Base • Built for Coinbase Wallet
         </p>
       </footer>
