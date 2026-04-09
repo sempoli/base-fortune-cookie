@@ -12,7 +12,7 @@ import { config } from './lib/web3';
 import { Cookie } from './components/Cookie';
 import { FortuneDisplay } from './components/FortuneDisplay';
 import { PREDICTIONS, FORTUNE_COOKIE_ABI, CONTRACT_ADDRESS, DEVELOPER_ADDRESS } from './constants';
-import { Sparkles, Wallet, AlertCircle, LogOut } from 'lucide-react';
+import { Sparkles, Wallet, AlertCircle, LogOut, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { base } from 'wagmi/chains';
 
@@ -179,11 +179,25 @@ function FortuneApp() {
                   </span>
                 </div>
                 {isConfirming && (
-                  <div className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-ping" />
-                    <span className="text-blue-500 font-mono text-[11px] uppercase tracking-widest font-bold">
-                      Mining...
-                    </span>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-ping" />
+                      <span className="text-blue-500 font-mono text-[11px] uppercase tracking-widest font-bold">
+                        Mining...
+                      </span>
+                    </div>
+                    {hash && (
+                      <motion.a 
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        href={`https://basescan.org/tx/${hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-[9px] text-gray-500 hover:text-amber-500 transition-colors uppercase tracking-widest font-bold"
+                      >
+                        View Transaction <ExternalLink className="w-2.5 h-2.5" />
+                      </motion.a>
+                    )}
                   </div>
                 )}
               </div>
