@@ -1,0 +1,16 @@
+{
+  "accountAssociation": {
+    "header": "eyJhbGciOiJFZERTQSIs...", 
+    "payload": "eyJkb21haW4iOiJiYXNlLWZvcnR1bmU...", 
+    "signature": "MHhjZjk..." 
+  },
+  "frame": {
+    "version": "1",
+    "name": "Base Fortune Cookie",
+    "iconUrl": "https://base-fortune-cookie.vercel.app/logo.svg",
+    "splashImageUrl": "https://base-fortune-cookie.vercel.app/logo.svg",
+    "splashBackgroundColor": "#0a0a0a",
+    "imageUrl": "https://base-fortune-cookie.vercel.app/thumbnail.svg",
+    "buttonTitle": "Crack a Cookie"
+  }
+}
