@@ -4,8 +4,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { WagmiProvider, useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
+import { WagmiProvider, useAccount, useSendTransaction, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { encodeFunctionData, stringToHex } from 'viem';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
 import { Identity, Name } from '@coinbase/onchainkit/identity';
 import { config } from './lib/web3';
@@ -26,7 +27,7 @@ function FortuneApp() {
   const [isBreaking, setIsBreaking] = useState(false);
   const [claimsToday, setClaimsToday] = useState(0);
 
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { sendTransaction, data: hash, isPending, error } = useSendTransaction();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   useEffect(() => {
@@ -85,13 +86,26 @@ function FortuneApp() {
 
     try {
       setPendingFortune(randomFortune);
-      writeContract({
-        address: CONTRACT_ADDRESS as `0x${string}`,
+      
+      // Encode function data
+      const encodedData = encodeFunctionData({
         abi: FORTUNE_COOKIE_ABI,
         functionName: 'crackCookie',
         args: [randomFortune],
+      });
+
+      // Append Builder Code: bc_0oqyy6qf
+      // This is required for Base Builder Rewards
+      const builderCode = 'bc_0oqyy6qf';
+      const builderCodeHex = stringToHex(builderCode).slice(2); // remove '0x'
+      const finalData = `${encodedData}${builderCodeHex}` as `0x${string}`;
+
+      sendTransaction({
+        to: CONTRACT_ADDRESS as `0x${string}`,
+        data: finalData,
         chainId: base.id,
       });
+      
       setIsBreaking(true);
     } catch (e) {
       console.error(e);
@@ -215,9 +229,9 @@ function FortuneApp() {
                   >
                     <Cookie
                       onBreak={handleBreak}
-                      isBreaking={isBreaking || isConfirming}
+                      isBreaking={isBreaking || isConfirming || isPending}
                       isBroken={isBroken}
-                      disabled={claimsToday >= 5 || isConfirming}
+                      disabled={claimsToday >= 5 || isConfirming || isPending}
                     />
                     
                     {claimsToday >= 5 && (
