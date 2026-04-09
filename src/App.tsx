@@ -19,7 +19,7 @@ import { base } from 'wagmi/chains';
 const queryClient = new QueryClient();
 
 function FortuneApp() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const [fortune, setFortune] = useState<string | null>(null);
   const [pendingFortune, setPendingFortune] = useState<string | null>(null);
   const [isBroken, setIsBroken] = useState(false);
@@ -28,6 +28,11 @@ function FortuneApp() {
 
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+
+  useEffect(() => {
+    if (hash) console.log("Transaction Hash:", hash);
+    if (error) console.error("Transaction Error:", error);
+  }, [hash, error]);
 
   // Read claims from contract
   const { data: userCookies, refetch: refetchCookies } = useReadContract({
@@ -85,7 +90,8 @@ function FortuneApp() {
         abi: FORTUNE_COOKIE_ABI,
         functionName: 'crackCookie',
         args: [randomFortune],
-      } as any);
+        chainId: base.id,
+      });
       setIsBreaking(true);
     } catch (e) {
       console.error(e);
@@ -219,6 +225,19 @@ function FortuneApp() {
                 )}
               </AnimatePresence>
             </div>
+
+            {isConnected && chainId !== base.id && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-4 p-5 bg-amber-500/10 border border-amber-500/20 rounded-[2rem] text-amber-500 text-sm w-full max-w-md backdrop-blur-xl"
+              >
+                <AlertCircle className="w-6 h-6 shrink-0" />
+                <p className="font-medium">
+                  Please switch to Base Mainnet to use this app.
+                </p>
+              </motion.div>
+            )}
 
             {error && (
               <motion.div
